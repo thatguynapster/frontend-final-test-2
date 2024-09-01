@@ -5,27 +5,15 @@ import Compass from "./icons/compass";
 import Board from "./icons/board";
 import Collections from "./icons/collections";
 import Brands from "./icons/brands";
-import { ChevronsLeft, Ellipsis, Lock, Plus } from "lucide-react";
-import { useWidth } from "@/hooks/useWidth";
-import { classNames } from "@/lib/helpers";
+import { ChevronsLeft, Ellipsis, Plus } from "lucide-react";
 import clsx from "clsx";
 import LockedBadge from "./locked-badge";
+import useStore from "@/hooks/useStore";
 
 type Props = {};
 
 const Sidebar = (props: Props) => {
-  const width = useWidth();
-  const isMobile = width! < 480;
-
-  const [collapse, setCollapse] = useState(true);
-
-  useEffect(() => {
-    if (!isMobile) return setCollapse(false);
-
-    return () => {
-      setCollapse(true);
-    };
-  }, [width]);
+  const { store, setStore } = useStore();
 
   const navOptions = [
     {
@@ -65,130 +53,145 @@ const Sidebar = (props: Props) => {
     },
   ];
 
+  const savedList = [
+    {
+      text: "Board name",
+    },
+    {
+      text: "Board name",
+    },
+    {
+      text: "Board name",
+    },
+    {
+      text: "Board name",
+    },
+    {
+      text: "Board name",
+    },
+  ];
+
   return (
-    <div
-      className={clsx(
-        "w-full h-[calc(100vh-5rem)]",
-        "bg-[#F5F5F580] border-r border-[#B4B4B4] overflow-y-auto relative",
-        { "p-5 max-w-[250px]": !collapse },
-        { "p-2.5 max-w-16 overflow-x-hidden": collapse },
-        "flex flex-col justify-between transition-all"
-      )}
-    >
-      <button
+    <div className="absolute left-0 top-0 bottom-0 z-10">
+      <div
         className={clsx(
-          "absolute z-30 p-4",
-          { "right-1 top-7": !collapse },
-          { "-right-5": collapse }
+          "h-[calc(100vh-5rem)] mt-20",
+          "bg-[#F5F5F5] border-r border-[#B4B4B4] overflow-y-auto relative",
+          { "p-5 w-full max-w-[250px]": !store?.sidebarCollapsed },
+          { "p-2.5 w-16 overflow-x-hidden": store?.sidebarCollapsed },
+          "flex flex-col justify-between transition-all"
         )}
-        onClick={(ev) => {
-          ev.stopPropagation();
-          setCollapse(!collapse);
-        }}
       >
-        <ChevronsLeft size={collapse ? 18 : 12} />
-      </button>
-
-      <div className="flex flex-col mb-auto">
-        <div className="flex flex-col">
-          {navOptions.map(({ active, icon, text }) => (
-            <NavOption key={text} {...{ active, collapse, icon, text }} />
-          ))}
-        </div>
-
-        <hr className="my-4 bg-[#B4B4B4]" />
-
-        <div className="flex flex-col gap-2.5">
-          {!collapse && (
-            <>
-              <p className="uppercase font-semibold text-xs text-[#7F7F7F]">
-                featured
-              </p>
-
-              <div>
-                {features.map(({ locked, text }) => (
-                  <FeatureOption key={text} {...{ locked, text }} />
-                ))}
-              </div>
-            </>
+        <button
+          className={clsx(
+            "absolute z-30 p-4",
+            { "right-1 top-7": !store?.sidebarCollapsed },
+            { "-right-5": store?.sidebarCollapsed }
           )}
-        </div>
+          onClick={(ev) => {
+            ev.stopPropagation();
+            setStore({ sidebarCollapsed: !store?.sidebarCollapsed });
+          }}
+        >
+          <ChevronsLeft size={store?.sidebarCollapsed ? 18 : 12} />
+        </button>
 
-        <hr className="my-4 bg-[#B4B4B4]" />
+        <div className="flex flex-col mb-auto">
+          <div className="flex flex-col">
+            {navOptions.map(({ active, icon, text }) => (
+              <NavOption
+                key={text}
+                {...{
+                  active,
+                  collapse: store?.sidebarCollapsed ?? false,
+                  icon,
+                  text,
+                }}
+              />
+            ))}
+          </div>
 
-        <div className="flex flex-col gap-2.5">
-          {!collapse && (
-            <>
-              <div className="flex justify-between pl-5">
+          <hr className="my-4 bg-[#B4B4B4]" />
+
+          <div className="flex flex-col gap-2.5">
+            {!store?.sidebarCollapsed && (
+              <>
                 <p className="uppercase font-semibold text-xs text-[#7F7F7F]">
-                  Saved
+                  featured
                 </p>
 
-                <Plus size={12} />
-              </div>
+                <div>
+                  {features.map(({ locked, text }) => (
+                    <FeatureOption key={text} {...{ locked, text }} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
 
-              <div>
-                <div className="w-[150px] h-[1px] bg-gradient-to-r from-[#A259FF] to-[#613599] rotate-90 origin-top-left"></div>
+          <hr className="my-4 bg-[#B4B4B4]" />
 
-                <div className="pl-5">
-                  <div className="flex gap-5 py-2.5 px-5">
-                    <p className="text-sm font-medium">All saved</p>
-                  </div>
+          <div className="flex flex-col gap-2.5">
+            {!store?.sidebarCollapsed && (
+              <>
+                <div className="flex justify-between pl-5">
+                  <p className="uppercase font-semibold text-xs text-[#7F7F7F]">
+                    Saved
+                  </p>
 
-                  <div className="flex gap-5 justify-between py-2.5 px-5">
-                    <p className="text-sm font-medium">Board name</p>
-                    <Ellipsis size={12} />
-                  </div>
+                  <Plus size={12} />
+                </div>
 
-                  <div className="flex gap-5 justify-between py-2.5 px-5">
-                    <p className="text-sm font-medium">Board name</p>
-                    <Ellipsis size={12} />
-                  </div>
+                <div>
+                  <div className="w-[150px] h-[1px] bg-gradient-to-r from-[#A259FF] to-[#613599] rotate-90 origin-top-left"></div>
 
-                  <div className="flex gap-5 justify-between py-2.5 px-5">
-                    <p className="text-sm font-medium">Board name</p>
-                    <Ellipsis size={12} />
-                  </div>
+                  <div className="pl-5">
+                    <div className="flex gap-5 py-2.5 px-5">
+                      <p className="text-sm font-medium">All saved</p>
+                    </div>
 
-                  <div className="flex gap-5 justify-between py-2.5 px-5">
-                    <p className="text-sm font-medium">Board name</p>
-                    <Ellipsis size={12} />
-                  </div>
-
-                  <div className="flex gap-5 justify-between py-2.5 px-5">
-                    <p className="text-sm font-medium">Board name</p>
-                    <Ellipsis size={12} />
+                    {savedList.map(({ text }, i) => (
+                      <div
+                        key={i}
+                        className="flex gap-5 justify-between py-2.5 px-5"
+                      >
+                        <p className="text-sm font-medium">{text}</p>
+                        <Ellipsis size={12} />
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
 
-              <div className="flex gap-5 justify-between py-2.5 px-5">
-                <p className="text-sm font-medium">View all boards</p>
-              </div>
-            </>
-          )}
+                <div className="flex gap-5 justify-between py-2.5 px-5">
+                  <p className="text-sm font-medium">View all boards</p>
+                </div>
+              </>
+            )}
+          </div>
+
+          <hr className="my-4 bg-[#B4B4B4]" />
+
+          <div className="flex flex-col gap-2.5 mb-auto">
+            {!store?.sidebarCollapsed && (
+              <>
+                <p className="font-medium">Settings</p>
+                <p className="font-medium">Help & Feedback</p>
+                <p className="font-medium whitespace-nowrap">
+                  Join the CreativeOS Slack
+                </p>
+              </>
+            )}
+          </div>
+
+          <hr className="my-4 bg-[#B4B4B4]" />
         </div>
 
-        <hr className="my-4 bg-[#B4B4B4]" />
-
-        <div className="flex flex-col gap-2.5 mb-auto">
-          {!collapse && (
-            <>
-              <p className="font-medium">Settings</p>
-              <p className="font-medium">Help & Feedback</p>
-              <p className="font-medium whitespace-nowrap">
-                Join the CreativeOS Slack
-              </p>
-            </>
+        <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 rounded-full bg-[#A259FF]"></div>
+          {!store?.sidebarCollapsed && (
+            <p className="font-medium">My Account</p>
           )}
         </div>
-
-        <hr className="my-4 bg-[#B4B4B4]" />
-      </div>
-
-      <div className="flex items-center gap-2.5">
-        <div className="w-10 h-10 rounded-full bg-[#A259FF]"></div>
-        {!collapse && <p className="font-medium">My Account</p>}
       </div>
     </div>
   );

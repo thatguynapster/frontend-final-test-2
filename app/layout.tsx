@@ -4,6 +4,7 @@ import "./globals.css";
 import { classNames } from "@/lib/helpers";
 import InfoBar from "@/components/info-bar";
 import Sidebar from "@/components/sidebar";
+import StoreProvider from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,16 +20,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className={classNames("h-screen overflow-hidden bg-white")}>
-          <InfoBar />
+      <StoreProvider>
+        <body className={inter.className}>
+          <div className={classNames("h-screen overflow-hidden bg-white")}>
+            <InfoBar />
 
-          <div className="relative mt-20 flex">
             <Sidebar />
-            <div className="flex-1 p-6">{children}</div>
+
+            {children}
           </div>
-        </div>
-      </body>
+        </body>
+      </StoreProvider>
     </html>
   );
 }
