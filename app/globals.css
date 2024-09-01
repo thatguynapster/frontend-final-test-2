@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 214, 219, 220;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.angular-gradient {
+  background: conic-gradient(
+    #f48b11,
+    #9383f9,
+    #004873,
+    #020304,
+    #000000,
+    #670889,
+    #cc2c69,
+    #ce3165
+  );
+}
